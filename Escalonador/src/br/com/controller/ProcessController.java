@@ -3,9 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package br.com.estruturas;
+package br.com.controller;
 
-import br.com.utilidades.Arquivo;
+import br.com.model.Processo;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,21 +13,19 @@ import java.util.List;
  *
  * @author nakao<nakaosensei@gmail.com>
  */
-public class ProcessLoader {
+public class ProcessController {
     private int numProcessos;
     private int prioridadeMinima;
     private int prioridadeMaxima;
     private List<Processo> processos;
 
-    public ProcessLoader(String path){
-        carregarEstruturas(path);
-        print();
+    public ProcessController(String arq){
+        carregarEstruturas(arq);
+        
     }
-    
-    private void carregarEstruturas(String path){
-        Arquivo arq = new Arquivo();
-        String o = arq.lerArquivo(path);
-        String v[]=o.split("\n");
+
+    private void carregarEstruturas(String arq){
+        String v[]=arq.split("\n");
         processos=new ArrayList<>();
         numProcessos=Integer.parseInt(v[0]);
         String prioridadeSplit[]=v[1].split("-");
@@ -50,6 +48,38 @@ public class ProcessLoader {
         for(Processo p:this.processos){
             p.println();
         }
+    }
+    
+    public int getNumProcessos() {
+        return numProcessos;
+    }
+
+    public void setNumProcessos(int numProcessos) {
+        this.numProcessos = numProcessos;
+    }
+
+    public int getPrioridadeMinima() {
+        return prioridadeMinima;
+    }
+
+    public void setPrioridadeMinima(int prioridadeMinima) {
+        this.prioridadeMinima = prioridadeMinima;
+    }
+
+    public int getPrioridadeMaxima() {
+        return prioridadeMaxima;
+    }
+
+    public void setPrioridadeMaxima(int prioridadeMaxima) {
+        this.prioridadeMaxima = prioridadeMaxima;
+    }
+
+    public List<Processo> getProcessos() {
+        return processos;
+    }
+
+    public void setProcessos(List<Processo> processos) {
+        this.processos = processos;
     }
     
 }

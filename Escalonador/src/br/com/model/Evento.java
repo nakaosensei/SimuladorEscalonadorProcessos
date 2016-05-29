@@ -3,17 +3,21 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package br.com.estruturas;
+package br.com.model;
 
 /**
  *
  * @author nakao<nakaosensei@gmail.com>
  */
-public class Operacao {
+public class Evento {
     private int tempo;
     private String evento;//Lock,Unlock,Termino
-
-    public Operacao(int tempo,String evento){
+    //Em caso de lock, o tempo indica quanto tempo
+    //o processo deve executar para ser bloqueado
+    //Em caso de unlock, se trata de quantos simbolos
+    //de execução geral precisam ser executados pra desbloquear
+    //Termino : valor do tempo executando pra sair o cara
+    public Evento(int tempo,String evento){
         this.tempo=tempo;
         this.evento=evento;
     }
