@@ -14,7 +14,8 @@ import br.com.model.politics.Politica;
 public class NewNivel {
     private int prioridade;
     private Politica politica;
-
+    
+    
     public NewNivel(int prioridade,Politica politica){
         this.politica=politica;
         this.prioridade=prioridade;

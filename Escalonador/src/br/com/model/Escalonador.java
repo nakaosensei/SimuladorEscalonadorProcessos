@@ -66,6 +66,7 @@ public class Escalonador {
                 }
             }   
             if(executando==null){//Se não tem ninguem executando
+                this.quantum=this.politica.getQuantum();//No caso de multiplas filas, o quantum pode variar
                 executando = politica.doSelectionPolitic(prontos);                    
                 if(executando!=null){
                     this.qtChaveamentos++;//Sempre que um processo sai da lista de prontos e vai para lista de execução, ocorre uma troca de contexto
@@ -78,6 +79,9 @@ public class Escalonador {
                 }
             }else{
                 //Se alguem esta executando
+                System.out.println(tempo);
+                System.out.println(this.getDiagramaEventosString());
+                
                 int tempoExecucao=getExecutionTime(executando);
                 executando.tempoOcupouCpu+=1;
                 if(tempo==tempoExecucao+quantum&&quantum!=0){                    

@@ -17,7 +17,7 @@ public class main {
         Arquivo arq = new Arquivo();
         ProcessController pl = new ProcessController(arq.lerArquivo("src/br/com/files/proc/teste.proc"));
    //     pl.print();
-        Experimento exp = new Experimento(arq.lerArquivo("src/br/com/files/exp/rr.exp"),pl);
+        Experimento exp = new Experimento(arq.lerArquivo("src/br/com/files/exp/rr666.exp"),pl);
         //exp.print();
     }
 }
