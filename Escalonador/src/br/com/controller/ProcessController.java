@@ -5,7 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * 
  * @author nakao<nakaosensei@gmail.com>
+ * 
  */
 public class ProcessController {
     private int numProcessos;
@@ -19,12 +21,8 @@ public class ProcessController {
     
     public ProcessController(){
         processos=new ArrayList<>();
-        numProcessos=0;
-        
-    }
-
-    
-    
+        numProcessos=0;       
+    }   
     
     private void carregarEstruturas(String arq){
         String v[]=arq.split("\n");
@@ -51,6 +49,7 @@ public class ProcessController {
     public void remove(Processo p){
         this.processos.remove(p);
     }
+    
     public void print(){
         System.out.println("Qtde Processos: "+this.numProcessos+" Prioridade Minima: "+prioridadeMinima +" Prioridade Maxima: "+this.prioridadeMaxima);
         System.out.println("Processos:");

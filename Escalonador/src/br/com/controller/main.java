@@ -15,9 +15,13 @@ import br.com.model.Experimento;
 public class main {
     public static void main(String[] args) {
         Arquivo arq = new Arquivo();
-        ProcessController pl = new ProcessController(arq.lerArquivo("src/br/com/files/proc/teste.proc"));
-   //     pl.print();
-        Experimento exp = new Experimento(arq.lerArquivo("src/br/com/files/exp/rr666.exp"),pl);
+        String in = arq.lerArquivo("src/br/com/files/fifo.exp");
+        String split[]=in.split("\n");
+        String arquivoArchs=arq.lerArquivo("src/br/com/files/"+split[1]);        
+        ProcessController pl = new ProcessController(arquivoArchs.trim());        
+        Experimento exp = new Experimento(in,pl);
+        String out = exp.getEscalonador().run();
+        arq.escreverArquivo(exp.getCaminhoArqSaida(), out);
         //exp.print();
     }
 }

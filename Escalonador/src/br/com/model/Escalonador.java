@@ -19,12 +19,13 @@ public class Escalonador {
     private List<Processo> bloqueados;
     private int tempo;
     private int qtChaveamentos;
-    private int tme;
-    private int tmr;
-    private int vazao;
+    private double tme;
+    private double tmr;
+    private double vazao;
     private List<Processo> sequenciaTermino;
     private List<Evento> diagramaEventos;
     private int quantum;
+    private int unidadesMilenio;
     
     public Escalonador(ProcessController processos,Politica politica){
         pc=processos;
@@ -35,6 +36,7 @@ public class Escalonador {
         tempo=0;        
         this.politica=politica;
         this.quantum=this.politica.getQuantum();
+        this.unidadesMilenio=1;
     }    
 
     public String run(){
@@ -56,6 +58,7 @@ public class Escalonador {
                     }                    
                     int lockTime=this.getLockTime(p);
                     if(tempo==lockTime+e.getTempoOcorrencia()){
+                        
                         this.diagramaEventos.add(new Evento("DESBLOQUEIO",tempo,p.getPid()));
                         toRm.add(p);
                     }
@@ -74,23 +77,24 @@ public class Escalonador {
                     if(tempo==tempoDaUltimaOp+1){//Se esta execucao ocorre exatamente depois de um bloqueio ou criacao
                         tempo--;                        
                     }
+                    Evento last=lastOperationIsCreation(executando);
+                    if(last!=null){
+                        tme+=tempo-last.getTempoOcorrencia();                        
+                    }
                     diagramaEventos.add(new Evento("EXEC",tempo,executando.getPid()));
                     //executando.tempoOcupouCpu+=1;
                 }
             }else{
-                //Se alguem esta executando
-                System.out.println(tempo);
-                System.out.println(this.getDiagramaEventosString());
-                
+                //Se alguem esta executando                                
                 int tempoExecucao=getExecutionTime(executando);
                 executando.tempoOcupouCpu+=1;
-                if(tempo==tempoExecucao+quantum&&quantum!=0){                    
+                if(tempo==tempoExecucao+quantum&&quantum!=0){
                     if(executando.tempoOcupouCpu<executando.getFim().getTempoOcorrencia()){
                         prontos.add(executando);
                         this.diagramaEventos.add(new Evento("QUANTUM_EX", tempo, executando.getPid()));
                         executando=null;                    
                     }                  
-                }else{                 
+                }else{
                     Evento e = executando.getSelectedEvent();                    
                     //Se eu nao estiver sobre um bloqueio, encontre o proximo bloqueio
                     while(!e.getNome().equals("BLOQUEIO")&&!e.getNome().equals("TERMINO")){
@@ -108,19 +112,59 @@ public class Escalonador {
                             executando=null;
                         }
                     }
-                    if(remainingTime==0){
-                        System.out.println(executando.tempoOcupouCpu);
+                    if(remainingTime<=0){
+                        if(tempo<=(1000*unidadesMilenio)){
+                            this.vazao++;
+                            
+                        }
+                        this.sequenciaTermino.add(executando);
                         diagramaEventos.add(new Evento("TERMINO",tempo, executando.getPid()));
                         executando=null;
                         tempo--;
                     }                  
                 }                        
-            }              
+            }           
             tempo++;          
+            if(tempo>1000*unidadesMilenio){
+                unidadesMilenio++;
+            }
         }
-        return getDiagramaEventosString();
+        this.qtChaveamentos--;
+        tme=tme/sequenciaTermino.size();
+        for(Processo p:sequenciaTermino){
+            tmr+=getLastExecutionTime(p)-getFirstExecutionTime(p);
+        }
+        tmr=tmr/sequenciaTermino.size();
+        String saida="";
+        saida+="CHAVEAMENTOS: "+this.qtChaveamentos+"\n"+"TME: "+tme+"\n"+"TMR: "+tmr+"\nVAZAO: "+vazao/unidadesMilenio+"\nSEQUENCIA DE TERMINO: ";
+        for(Processo p:sequenciaTermino){
+            saida+=p.getPid()+" ";
+        }
+        saida+="\n"+getDiagramaEventosString();
+        return saida;
     }
 
+    public int getFirstExecutionTime(Processo p){
+        Evento tmp;
+        for(int i = 0;i<=diagramaEventos.size()-1;i++){
+            tmp=diagramaEventos.get(i);
+            if(tmp.getOwnerId()==p.getPid()&tmp.getNome().equals("EXEC")){
+                return tmp.getTempoOcorrencia();
+            }
+        }
+        return -1;
+    }
+    public int getLastExecutionTime(Processo p){
+        Evento tmp;
+        for(int i = diagramaEventos.size()-1;i>=0;i--){
+            tmp=diagramaEventos.get(i);
+            if(tmp.getOwnerId()==p.getPid()&tmp.getNome().equals("EXEC")){
+                return tmp.getTempoOcorrencia();
+            }
+        }
+        return -1;
+    }
+    
     public String getDiagramaEventosString(){
         String out="";
         Collections.sort (this.diagramaEventos, new Comparator() {
@@ -146,6 +190,22 @@ public class Escalonador {
         }
         return -1;
     }
+    
+    private Evento lastOperationIsCreation (Processo p){
+        Evento tmp;
+        for(int i = diagramaEventos.size()-1;i>=0;i--){
+            tmp=diagramaEventos.get(i);
+            if(tmp.getOwnerId()==p.getPid()){
+                if(tmp.getNome().equals("CRIACAO")){
+                    return tmp;
+                }else{
+                    return null;
+                }                
+            }
+        }
+        return null;
+    }
+    
     
     private int getLockTime(Processo p){
         Evento tmp;

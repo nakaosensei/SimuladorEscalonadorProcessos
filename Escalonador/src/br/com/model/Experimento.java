@@ -22,12 +22,13 @@ public class Experimento {
     protected Escalonador escalonador;
     protected String[] param;
                 
+    
     public Experimento(String file,ProcessController pc){
-        carregar(file,pc);
-        String out=this.escalonador.run();
-        System.out.println(out);
+        carregar(file,pc);        
+        
     }
     
+        
     public void carregar(String experimentFile,ProcessController pc){
         param=experimentFile.split("\n");
         this.nomeExp=param[0];
@@ -35,6 +36,15 @@ public class Experimento {
         this.caminhoArqSaida=param[2];
         Politica p = generatePolitic(param[3]);
         this.escalonador=new Escalonador(pc, p);        
+    }
+    
+    public void carregar(String experimentFile){
+        this.param=experimentFile.split("\n");
+        this.nomeExp=param[0];
+        this.caminhoArqProcessos=param[1];
+        this.caminhoArqSaida=param[2];
+        Politica p = generatePolitic(param[3]);
+        //this.escalonador=new Escalonador(pc, p);        
     }
     
     public void print(){
@@ -72,6 +82,46 @@ public class Experimento {
             return new FilaPrioridades("fp",0,niveis);
         }
         return null;
+    }
+
+    public String getNomeExp() {
+        return nomeExp;
+    }
+
+    public void setNomeExp(String nomeExp) {
+        this.nomeExp = nomeExp;
+    }
+
+    public String getCaminhoArqProcessos() {
+        return caminhoArqProcessos;
+    }
+
+    public void setCaminhoArqProcessos(String caminhoArqProcessos) {
+        this.caminhoArqProcessos = caminhoArqProcessos;
+    }
+
+    public String getCaminhoArqSaida() {
+        return caminhoArqSaida;
+    }
+
+    public void setCaminhoArqSaida(String caminhoArqSaida) {
+        this.caminhoArqSaida = caminhoArqSaida;
+    }
+
+    public Escalonador getEscalonador() {
+        return escalonador;
+    }
+
+    public void setEscalonador(Escalonador escalonador) {
+        this.escalonador = escalonador;
+    }
+
+    public String[] getParam() {
+        return param;
+    }
+
+    public void setParam(String[] param) {
+        this.param = param;
     }
     
     
