@@ -1,12 +1,13 @@
 package br.com.model;
-
 import br.com.controller.ProcessController;
-import br.com.model.politicas.Fifo;
-import br.com.model.politicas.FilaPrioridades;
-import br.com.model.politicas.Sjf;
-import br.com.model.politicas.Politica;
-import br.com.model.politicas.Random;
-import br.com.model.politicas.RoundRobin;
+
+import br.com.model.politics.FilaPrioridades;
+import br.com.model.politics.Sjf;
+
+import br.com.model.politics.Random;
+import br.com.model.politics.RoundRobin;
+import br.com.model.politics.Fcfs;
+import br.com.model.politics.Politica;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,12 +19,13 @@ public class Experimento {
     protected String nomeExp;
     protected String caminhoArqProcessos;//Ja inclui o nome do arquivo
     protected String caminhoArqSaida;
-    protected Politica politica;
+    protected Escalonador escalonador;
     protected String[] param;
-    
-            
+                
     public Experimento(String file,ProcessController pc){
         carregar(file,pc);
+        String out=this.escalonador.run();
+        System.out.println(out);
     }
     
     public void carregar(String experimentFile,ProcessController pc){
@@ -31,41 +33,43 @@ public class Experimento {
         this.nomeExp=param[0];
         this.caminhoArqProcessos=param[1];
         this.caminhoArqSaida=param[2];
-        this.politica=generatePolitic(param[3],pc);        
+        Politica p = generatePolitic(param[3]);
+        this.escalonador=new Escalonador(pc, p);        
     }
     
     public void print(){
         System.out.print("Nome Experimento: "+this.nomeExp+"\n"+"Arquivo Processos: "+this.caminhoArqProcessos+"\n"+"Arquivo saida: "+this.caminhoArqSaida+"\n");
-        this.politica.print();
+        
     }   
-    private Politica generatePoliticRoundRobin(int quantum,ProcessController pc){
-        return new RoundRobin(pc,quantum);
+    
+    private Politica generatePoliticRoundRobin(int quantum){
+        return new RoundRobin("rr",quantum);
     }
     
-    public Politica generatePolitic(String algoritmo,ProcessController pc){
+    public Politica generatePolitic(String algoritmo){
         algoritmo = algoritmo.trim();
         if(algoritmo.equals("fcfs")){
-            return new Fifo(pc);
+            return new Fcfs("fcfs", 0);
         }else if(algoritmo.equals("rr")){
-            return new RoundRobin(pc,Integer.parseInt(param[4]));
+            return new RoundRobin("rr",Integer.parseInt(param[4]));
         }else if(algoritmo.equals("sjf")){
-            return new Sjf(pc);
-        }else if(algoritmo.equals("rand")){
-            return new Random(pc);
+            return new Sjf("sjf",0);
+        }else if(algoritmo.equals("random")){
+            return new Random("random",0);
         }else if(algoritmo.equals("fp")){
-            List<Politica> politicas = new ArrayList<>();
+            List<NewNivel> niveis = new ArrayList<>();
             for(int i = 5;i<=param.length-1;i++){
                 if(param[i].contains("rr")){
                     String quantum="";
                     for(int j = 3;param[i].charAt(j)!=')';j++){
                         quantum+=param[i].charAt(j);
                     }
-                    politicas.add(generatePoliticRoundRobin(Integer.parseInt(quantum),pc));
+                    niveis.add(new NewNivel(i-4,generatePoliticRoundRobin(Integer.parseInt(quantum))));
                 }else{
-                    politicas.add(generatePolitic(param[i],pc));
+                    niveis.add(new NewNivel(i-4,generatePolitic(param[i])));
                 }                
             }
-            return new FilaPrioridades(pc,Integer.parseInt(param[4]),politicas);
+            return new FilaPrioridades("fp",0,niveis);
         }
         return null;
     }

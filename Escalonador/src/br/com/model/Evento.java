@@ -9,36 +9,68 @@ package br.com.model;
  *
  * @author nakao<nakaosensei@gmail.com>
  */
-public class Evento {
-    private int tempo;
-    private String evento;//Lock,Unlock,Termino
-    //Em caso de lock, o tempo indica quanto tempo
-    //o processo deve executar para ser bloqueado
-    //Em caso de unlock, se trata de quantos simbolos
-    //de execução geral precisam ser executados pra desbloquear
-    //Termino : valor do tempo executando pra sair o cara
-    public Evento(int tempo,String evento){
-        this.tempo=tempo;
-        this.evento=evento;
+public class Evento implements Cloneable{
+    protected int tempoOcorrencia;
+    protected int ownerId;
+    protected String nome;//Lock,Unlock,Inicio,Fim,Quantum_ex,Execucao
+
+    
+    public Evento(String nome,int tempoOcorrencia,int ownerId){
+        this.tempoOcorrencia=tempoOcorrencia;
+        this.ownerId=ownerId;
+        this.nome=nome;
+        
     }
     
-    public int getTempo() {
-        return tempo;
-    }
-
-    public void setTempo(int id) {
-        this.tempo = id;
-    }
-
-    public String getEvento() {
-        return evento;
-    }
-
-    public void setEvento(String evento) {
-        this.evento = evento;
+    public void println(){
+        System.out.println(nome+" Tempo:"+this.tempoOcorrencia+" PID:"+this.ownerId);
     }
     
-    public void println(){        
-        System.out.println(this.tempo+" "+this.evento);
+    
+    public String getStringEvt(){
+        return ("Tempo:"+this.tempoOcorrencia+" Evento:"+this.nome+" PID:"+this.ownerId);
+    }
+    
+    public int getTempoOcorrencia() {
+        return tempoOcorrencia;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+    
+    public void setTempoOcorrencia(int tempoOcorrencia) {
+        this.tempoOcorrencia = tempoOcorrencia;
+    }
+
+    public int getOwnerId() {
+        return ownerId;
+    }
+
+    public void setOwnerId(int ownerId) {
+        this.ownerId = ownerId;
+    }   
+    public Evento getClone(int tempo){
+        try {
+            Evento e = (Evento)this.clone();
+            e.setTempoOcorrencia(tempo);
+            return e;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return null;        
+    }
+    public Evento getClone(){
+        try {
+            Evento e = (Evento)this.clone();
+            return e;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return null;        
     }
 }

@@ -1,16 +1,10 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package br.com.controller;
-
+import br.com.model.Evento;
 import br.com.model.Processo;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
  * @author nakao<nakaosensei@gmail.com>
  */
 public class ProcessController {
@@ -18,12 +12,20 @@ public class ProcessController {
     private int prioridadeMinima;
     private int prioridadeMaxima;
     private List<Processo> processos;
-
+    
     public ProcessController(String arq){
-        carregarEstruturas(arq);
+        carregarEstruturas(arq);        
+    }
+    
+    public ProcessController(){
+        processos=new ArrayList<>();
+        numProcessos=0;
         
     }
 
+    
+    
+    
     private void carregarEstruturas(String arq){
         String v[]=arq.split("\n");
         processos=new ArrayList<>();
@@ -41,12 +43,37 @@ public class ProcessController {
             }
         }
     }
+
+    public void add(Processo p){
+        this.processos.add(p);
+    }
     
+    public void remove(Processo p){
+        this.processos.remove(p);
+    }
     public void print(){
         System.out.println("Qtde Processos: "+this.numProcessos+" Prioridade Minima: "+prioridadeMinima +" Prioridade Maxima: "+this.prioridadeMaxima);
         System.out.println("Processos:");
         for(Processo p:this.processos){
-            p.println();
+            p.println();System.out.println("");
+        }
+    }
+    
+    public List<Processo> getWhoArrivedAtThatTime(int time){
+        List<Processo> arrived=new ArrayList<>();
+        for(Processo p:this.processos){
+            if(p.getInicio().getTempoOcorrencia()==time){
+                arrived.add(p);
+            }
+        }
+        return arrived;        
+    }
+    
+    public boolean contains(Processo p){
+        if(this.processos.contains(p)){
+            return true;
+        }else{
+            return false;
         }
     }
     
@@ -81,5 +108,13 @@ public class ProcessController {
     public void setProcessos(List<Processo> processos) {
         this.processos = processos;
     }
-    
+
+    public Processo getEvtOwner(Evento e){
+        for(Processo p:this.processos){
+            if(p.getPid()==e.getOwnerId()){
+                return p;
+            }
+        }
+        return null;
+    }
 }
