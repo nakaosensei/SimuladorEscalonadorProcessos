@@ -10,7 +10,7 @@ import java.util.List;
 public class Processo {
     private int pid;
     private int prioridade;
-    private int qtEventos;//indica quantos eventos este processo tera.  Este numero inclui a quantidade de linhas inclusive e entre T ENTRADA e TN TERMINO
+    private int qtEventos;
     private Evento inicio;
     private Evento fim;
     private List<Evento> eventos;
@@ -73,7 +73,7 @@ public class Processo {
     }
     
     public Evento getSelectedEvent(){
-        if(eventoSelecionado>this.eventos.size()){
+        if(eventoSelecionado>this.eventos.size()-1){
             return null;
         }
         return this.eventos.get(eventoSelecionado);
@@ -84,14 +84,7 @@ public class Processo {
     }
 
     public int getRemainingExecutionTime(){
-        int blockTime=0;
-        int totalBurstTime;
-        for(int i = eventoSelecionado;i<=this.eventos.size()-1;i++){
-            if(eventos.get(i).getNome().equals("DESBLOQUEIO")){
-                blockTime+=eventos.get(i).getTempoOcorrencia();
-            }            
-        }        
-        return this.fim.getTempoOcorrencia()-blockTime;
+        return this.fim.getTempoOcorrencia()-tempoOcupouCpu;
     }
     
     public boolean isShortest(Processo p){
@@ -106,7 +99,9 @@ public class Processo {
         System.out.println("Eventos");
         for(Evento op:this.eventos){
             op.println();
-        }        
+        }   
+        System.out.println("Evento selecionado");
+        this.getSelectedEvent().println();
     }
 
     public int getPid() {

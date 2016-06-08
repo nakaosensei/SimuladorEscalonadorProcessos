@@ -5,7 +5,6 @@
  */
 package br.com.controller;
 
-import br.com.model.Arquivo;
 import br.com.model.Experimento;
 
 /**
@@ -15,13 +14,14 @@ import br.com.model.Experimento;
 public class main {
     public static void main(String[] args) {
         Arquivo arq = new Arquivo();
-        String in = arq.lerArquivo("src/br/com/files/fifo.exp");
+        String in = arq.lerArquivo("src/br/com/files/sjf.exp");
         String split[]=in.split("\n");
-        String arquivoArchs=arq.lerArquivo("src/br/com/files/"+split[1]);        
-        ProcessController pl = new ProcessController(arquivoArchs.trim());        
+        String arquivoProcessos=arq.lerArquivo("src/br/com/files/"+split[1]);        
+        ProcessController pl = new ProcessController(arquivoProcessos.trim());
+        
         Experimento exp = new Experimento(in,pl);
         String out = exp.getEscalonador().run();
-        arq.escreverArquivo(exp.getCaminhoArqSaida(), out);
-        //exp.print();
+        System.out.println(out);
+        arq.escreverArquivo(exp.getCaminhoArqSaida(), out);        
     }
 }

@@ -1,6 +1,7 @@
-package br.com.model;
+package br.com.controller;
 
-import br.com.controller.ProcessController;
+import br.com.model.Evento;
+import br.com.model.Processo;
 import br.com.model.politics.Politica;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,7 +14,7 @@ import java.util.List;
  */
 public class Escalonador {
     private Politica politica;
-    private ProcessController pc;
+    private ProcessController processController;
     private List<Processo> prontos;
     private Processo executando;
     private List<Processo> bloqueados;
@@ -28,7 +29,7 @@ public class Escalonador {
     private int unidadesMilenio;
     
     public Escalonador(ProcessController processos,Politica politica){
-        pc=processos;
+        processController=processos;
         prontos=new ArrayList<>();
         bloqueados=new ArrayList<>();
         sequenciaTermino = new ArrayList<>();
@@ -40,28 +41,28 @@ public class Escalonador {
     }    
 
     public String run(){
-        while(pc.getProcessos().size()>0||prontos.size()>0||bloqueados.size()>0||executando!=null){
-            List<Processo> plusToProntos=pc.getWhoArrivedAtThatTime(this.tempo);
+        while(processController.getProcessos().size()>0||prontos.size()>0
+              ||bloqueados.size()>0||executando!=null){
+            List<Processo> plusToProntos=processController.getWhoArrivedAtt(this.tempo);
             for(Processo p:plusToProntos){
-                pc.remove(p);
+                processController.remove(p);                
                 diagramaEventos.add(new Evento("CRIACAO", tempo, p.getPid()));
                 p.moveToNextEvent();
                 prontos.add(p);                
-            }            
+            }                        
             if(!bloqueados.isEmpty()){
                 List<Processo> toRm = new ArrayList<>();
                 for(Processo p:this.bloqueados){
-                    Evento e = p.getSelectedEvent();
-                    while(!e.getNome().equals("DESBLOQUEIO")){
+                    Evento e = p.getSelectedEvent();                    
+                    while(!e.getNome().equals("DESBLOQUEIO")){                        
                         p.moveToNextEvent();
-                        e = p.getSelectedEvent();
+                        e = p.getSelectedEvent();                        
                     }                    
-                    int lockTime=this.getLockTime(p);
-                    if(tempo==lockTime+e.getTempoOcorrencia()){
-                        
+                    int lockTime=this.getLockTime(p);                    
+                    if(tempo==lockTime+e.getTempoOcorrencia()){                        
                         this.diagramaEventos.add(new Evento("DESBLOQUEIO",tempo,p.getPid()));
                         toRm.add(p);
-                    }
+                    }                    
                 }
                 for(Processo r:toRm){                        
                     bloqueados.remove(r);
@@ -70,7 +71,7 @@ public class Escalonador {
             }   
             if(executando==null){//Se não tem ninguem executando
                 this.quantum=this.politica.getQuantum();//No caso de multiplas filas, o quantum pode variar
-                executando = politica.doSelectionPolitic(prontos);                    
+                executando = politica.doSelectionPolitic(prontos);                
                 if(executando!=null){
                     this.qtChaveamentos++;//Sempre que um processo sai da lista de prontos e vai para lista de execução, ocorre uma troca de contexto
                     int tempoDaUltimaOp=this.getLockOrCreationTime();                
@@ -81,8 +82,7 @@ public class Escalonador {
                     if(last!=null){
                         tme+=tempo-last.getTempoOcorrencia();                        
                     }
-                    diagramaEventos.add(new Evento("EXEC",tempo,executando.getPid()));
-                    //executando.tempoOcupouCpu+=1;
+                    diagramaEventos.add(new Evento("EXEC",tempo,executando.getPid()));                    
                 }
             }else{
                 //Se alguem esta executando                                
@@ -92,21 +92,18 @@ public class Escalonador {
                     if(executando.tempoOcupouCpu<executando.getFim().getTempoOcorrencia()){
                         prontos.add(executando);
                         this.diagramaEventos.add(new Evento("QUANTUM_EX", tempo, executando.getPid()));
-                        executando=null;                    
+                        executando=null;      
                     }                  
                 }else{
                     Evento e = executando.getSelectedEvent();                    
-                    //Se eu nao estiver sobre um bloqueio, encontre o proximo bloqueio
-                    while(!e.getNome().equals("BLOQUEIO")&&!e.getNome().equals("TERMINO")){
-                        if(!e.getNome().equals("TERMINO")){
+                    while(!e.getNome().equals("BLOQUEIO")&&!e.getNome().equals("TERMINO")){                        
                             executando.moveToNextEvent();
-                            e = executando.getSelectedEvent();
-                        }   
+                            e = executando.getSelectedEvent();                           
                     }
-                    //Agora, com certeza estou sobre um bloqueio ou termino
                     int remainingTime=executando.getFim().getTempoOcorrencia()-executando.tempoOcupouCpu;
                     if(e.getNome().equals("BLOQUEIO")){
-                        if(tempo==tempoExecucao+e.getTempoOcorrencia()&&remainingTime>=e.getTempoOcorrencia()){
+                        if(tempo==tempoExecucao+e.getTempoOcorrencia()
+                           &&remainingTime>=e.getTempoOcorrencia()){
                             diagramaEventos.add(new Evento(e.getNome(),tempo, executando.getPid()));
                             bloqueados.add(executando);
                             executando=null;
@@ -114,8 +111,7 @@ public class Escalonador {
                     }
                     if(remainingTime<=0){
                         if(tempo<=(1000*unidadesMilenio)){
-                            this.vazao++;
-                            
+                            this.vazao++;                            
                         }
                         this.sequenciaTermino.add(executando);
                         diagramaEventos.add(new Evento("TERMINO",tempo, executando.getPid()));
@@ -136,7 +132,8 @@ public class Escalonador {
         }
         tmr=tmr/sequenciaTermino.size();
         String saida="";
-        saida+="CHAVEAMENTOS: "+this.qtChaveamentos+"\n"+"TME: "+tme+"\n"+"TMR: "+tmr+"\nVAZAO: "+vazao/unidadesMilenio+"\nSEQUENCIA DE TERMINO: ";
+        saida+="CHAVEAMENTOS: "+this.qtChaveamentos+"\n"+"TME: "+tme+"\n"+"TMR: "
+        +tmr+"\nVAZAO: "+vazao/unidadesMilenio+"\nSEQUENCIA DE TERMINO: ";
         for(Processo p:sequenciaTermino){
             saida+=p.getPid()+" ";
         }

@@ -19,11 +19,7 @@ public class ProcessController {
         carregarEstruturas(arq);        
     }
     
-    public ProcessController(){
-        processos=new ArrayList<>();
-        numProcessos=0;       
-    }   
-    
+  
     private void carregarEstruturas(String arq){
         String v[]=arq.split("\n");
         processos=new ArrayList<>();
@@ -58,7 +54,7 @@ public class ProcessController {
         }
     }
     
-    public List<Processo> getWhoArrivedAtThatTime(int time){
+    public List<Processo> getWhoArrivedAtt(int time){
         List<Processo> arrived=new ArrayList<>();
         for(Processo p:this.processos){
             if(p.getInicio().getTempoOcorrencia()==time){

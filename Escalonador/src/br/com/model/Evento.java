@@ -9,10 +9,10 @@ package br.com.model;
  *
  * @author nakao<nakaosensei@gmail.com>
  */
-public class Evento implements Cloneable{
+public class Evento{
     protected int tempoOcorrencia;
     protected int ownerId;
-    protected String nome;//Lock,Unlock,Inicio,Fim,Quantum_ex,Execucao
+    protected String nome;
 
     
     public Evento(String nome,int tempoOcorrencia,int ownerId){
@@ -54,23 +54,5 @@ public class Evento implements Cloneable{
     public void setOwnerId(int ownerId) {
         this.ownerId = ownerId;
     }   
-    public Evento getClone(int tempo){
-        try {
-            Evento e = (Evento)this.clone();
-            e.setTempoOcorrencia(tempo);
-            return e;
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        return null;        
-    }
-    public Evento getClone(){
-        try {
-            Evento e = (Evento)this.clone();
-            return e;
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        return null;        
-    }
+   
 }

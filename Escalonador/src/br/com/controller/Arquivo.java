@@ -1,4 +1,4 @@
-package br.com.model;
+package br.com.controller;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;

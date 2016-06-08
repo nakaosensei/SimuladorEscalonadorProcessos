@@ -11,12 +11,12 @@ import br.com.model.politics.Politica;
  *
  * @author nakao<nakaosensei@gmail.com>
  */
-public class NewNivel {
+public class Nivel {
     private int prioridade;
     private Politica politica;
     
     
-    public NewNivel(int prioridade,Politica politica){
+    public Nivel(int prioridade,Politica politica){
         this.politica=politica;
         this.prioridade=prioridade;
     }
