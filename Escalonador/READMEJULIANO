@@ -1,0 +1,6 @@
+Olá professor, este é o txt para lhe auxiliar a executar esta APS.
+
+Primeiramente, para facilitar a sua vida nos testes, vá até a pasta src/br/com/files
+Agora, abra o terminal e digite java -jar Escalonador.jar fifo.proc
+
+Pronto, esse é o procedimento basica para os testes, até mais o/
